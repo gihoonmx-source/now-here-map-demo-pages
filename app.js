@@ -580,7 +580,7 @@ function initMap(){
   var opts={center:{lat:CONFIG.MAP_CENTER_LAT,lng:CONFIG.MAP_CENTER_LNG},zoom:CONFIG.MAP_ZOOM,disableDefaultUI:false,zoomControl:true,mapTypeControl:false,streetViewControl:false,fullscreenControl:true};
   if(CONFIG.MAP_ID&&CONFIG.MAP_ID.length>0) opts.mapId=CONFIG.MAP_ID; else opts.styles=mapStyles();
   map=new google.maps.Map(document.getElementById('map'),opts);
-  fetch(CONFIG.GEOJSON_PATH).then(function(r){return r.json();}).then(function(geo){originalGeoJson=geo;applyGeoJsonToMap();fitBoundsToData();loadZonesFromStorage();});
+  fetch(CONFIG.GEOJSON_PATH).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(function(geo){originalGeoJson=geo;applyGeoJsonToMap();fitBoundsToData();loadZonesFromStorage();hideMapLoading();}).catch(function(err){hideMapLoading();var el=document.getElementById('info-text');if(el)el.textContent='⚠️ 경계 데이터를 불러오지 못했습니다. ('+err.message+')';});
   refreshMapStyles();
   map.data.addListener('click',function(e){if(currentMode!=='local')return;var f=e.feature;if(selectedFeature===f){selectedFeature=null;refreshMapStyles();updateInfoPanel(null);return;}selectedFeature=f;refreshMapStyles();var raw=f.getProperty('adm_nm')||f.getProperty('name')||'(이름 없음)';var p=raw.split(' ');updateInfoPanel(p.length>2?p.slice(2).join(' '):raw);});
   map.addListener('click',function(){if(currentMode==='local'&&selectedFeature){selectedFeature=null;refreshMapStyles();updateInfoPanel(null);}});
@@ -657,6 +657,20 @@ function bindInput(id,type,obj,prop,cb){
 }
 
 /* ========== 유틸리티 ========== */
+function hideMapLoading(){var el=document.getElementById('map-loading');if(el)el.classList.add('hidden');}
+
+function initPanelCollapse(){
+  var btn=document.getElementById('panel-collapse');
+  var panel=document.getElementById('left-panel');
+  if(!btn||!panel) return;
+  btn.addEventListener('click',function(){
+    var collapsed=panel.classList.toggle('collapsed');
+    btn.setAttribute('aria-expanded',collapsed?'false':'true');
+    btn.setAttribute('aria-label',collapsed?'패널 펼치기':'패널 접기');
+    btn.setAttribute('title',collapsed?'패널 펼치기':'패널 접기');
+  });
+}
+
 function fitBoundsToData(){var b=new google.maps.LatLngBounds();map.data.forEach(function(f){var g=f.getGeometry();if(g)g.forEachLatLng(function(ll){b.extend(ll);});});if(!b.isEmpty())map.fitBounds(b,60);}
 
 function updateInfoPanel(content){
@@ -668,7 +682,9 @@ function updateInfoPanel(content){
 function mapStyles(){return [{elementType:'geometry',stylers:[{color:'#1d2c4d'}]},{elementType:'labels.text.fill',stylers:[{color:'#8ec3b9'}]},{elementType:'labels.text.stroke',stylers:[{color:'#1a3646'}]},{featureType:'administrative',elementType:'geometry',stylers:[{visibility:'off'}]},{featureType:'landscape',elementType:'geometry',stylers:[{color:'#1d3044'}]},{featureType:'poi',elementType:'geometry',stylers:[{color:'#263c3f'}]},{featureType:'road',elementType:'geometry',stylers:[{color:'#304a7d'}]},{featureType:'road.highway',elementType:'geometry',stylers:[{color:'#2c6675'}]},{featureType:'water',elementType:'geometry',stylers:[{color:'#0e1626'}]}];}
 
 (function(){
-  if(typeof CONFIG==='undefined'||!CONFIG.GOOGLE_MAPS_API_KEY){document.getElementById('info-text').textContent='⚠️ config.js에 API 키를 설정해 주세요.';return;}
-  if(CONFIG.GOOGLE_MAPS_API_KEY==='YOUR_API_KEY'){document.getElementById('info-text').textContent='⚠️ config.js에 실제 API 키를 입력해 주세요.';return;}
+  // 패널 접기/펼치기는 지도 로드 성공 여부와 무관하게 항상 동작
+  initPanelCollapse();
+  if(typeof CONFIG==='undefined'||!CONFIG.GOOGLE_MAPS_API_KEY){document.getElementById('info-text').textContent='⚠️ config.js에 API 키를 설정해 주세요.';hideMapLoading();return;}
+  if(CONFIG.GOOGLE_MAPS_API_KEY==='YOUR_API_KEY'){document.getElementById('info-text').textContent='⚠️ config.js에 실제 API 키를 입력해 주세요.';hideMapLoading();return;}
   var s=document.createElement('script');s.src='https://maps.googleapis.com/maps/api/js?key='+CONFIG.GOOGLE_MAPS_API_KEY+'&callback=initMap';s.async=true;s.defer=true;document.head.appendChild(s);
 })();
