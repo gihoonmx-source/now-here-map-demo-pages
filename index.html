@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <meta name="description" content="대한민국 동 단위 행정구역 경계를 Google Maps 위에 인터랙티브하게 표시하는 데모 페이지" />
   <title>동 단위 행정구역 경계 뷰어 – Now Here</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=1.1.0" />
 </head>
 <body>
 
@@ -13,6 +16,8 @@
 
   <!-- 좌측 통합 패널 -->
   <div id="left-panel">
+    
+    <div id="app-version">v1.1.0</div>
 
     <!-- 모드 토글 -->
     <div id="mode-toggle">
@@ -104,7 +109,7 @@
     </div>
   </div>
 
-  <script src="config.js"></script>
-  <script src="app.js"></script>
+  <script src="config.js?v=1.1.0"></script>
+  <script src="app.js?v=1.1.0"></script>
 </body>
 </html>
