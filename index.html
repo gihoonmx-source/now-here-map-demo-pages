@@ -11,8 +11,10 @@
 
   <div id="map"></div>
 
-  <!-- 좌측 패널 -->
-  <div id="info-panel">
+  <!-- 좌측 통합 패널 -->
+  <div id="left-panel">
+
+    <!-- 모드 토글 -->
     <div id="mode-toggle">
       <div class="mode-indicator"></div>
       <button class="mode-btn active" data-mode="local"><span class="mode-icon">📍</span> 로컬</button>
@@ -23,7 +25,7 @@
 
     <!-- 트렌드 존 저장 -->
     <div id="zone-save-area" style="display:none;">
-      <div id="zone-action-row">
+      <div class="zone-action-row">
         <button id="zone-save-btn" class="action-btn accent">트렌드 존 저장</button>
         <button id="hex-deselect-btn" class="action-btn danger">전체 해제</button>
       </div>
@@ -50,53 +52,54 @@
     <div id="zone-list-area" style="display:none;">
       <h4 class="zone-list-title">📌 트렌드 존</h4>
       <div id="zone-list"></div>
-    </div>
-  </div>
-
-  <!-- 설정 토글 -->
-  <button id="settings-toggle" aria-label="스타일 설정 열기">
-    <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-      <path d="M10 13a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.5"/>
-      <path d="M16.5 10a6.5 6.5 0 01-.4 2.2l1.6 1.3-1.4 2.4-1.9-.6a6.5 6.5 0 01-1.9 1.1l-.3 2h-2.8l-.3-2a6.5 6.5 0 01-1.9-1.1l-1.9.6-1.4-2.4 1.6-1.3A6.5 6.5 0 013.5 10c0-.8.1-1.5.4-2.2L2.3 6.5l1.4-2.4 1.9.6A6.5 6.5 0 017.5 3.6l.3-2h2.8l.3 2c.7.2 1.3.6 1.9 1.1l1.9-.6 1.4 2.4-1.6 1.3c.3.7.4 1.4.4 2.2z" stroke="currentColor" stroke-width="1.5"/>
-    </svg>
-  </button>
-
-  <!-- 설정 패널 -->
-  <div id="settings-panel">
-    <h3>⚙️ 스타일 설정</h3>
-    <div id="local-settings">
-      <div class="settings-section">
-        <h4>비선택 구역</h4>
-        <div class="setting-row"><label for="default-fill">배경색</label><input type="color" id="default-fill" value="#cccccc" /></div>
-        <div class="setting-row"><label for="default-stroke">테두리색</label><input type="color" id="default-stroke" value="#999999" /></div>
-        <div class="setting-row"><label for="default-fill-opacity">투명도</label><input type="range" id="default-fill-opacity" min="0" max="1" step="0.05" value="0.12" /><span class="range-val">0.12</span></div>
-        <div class="setting-row"><label for="default-stroke-weight">굵기</label><input type="range" id="default-stroke-weight" min="0.5" max="6" step="0.5" value="1" /><span class="range-val">1</span></div>
-      </div>
-      <div class="settings-section">
-        <h4>선택 구역</h4>
-        <div class="setting-row"><label for="highlight-fill">배경색</label><input type="color" id="highlight-fill" value="#ff3333" /></div>
-        <div class="setting-row"><label for="highlight-stroke">테두리색</label><input type="color" id="highlight-stroke" value="#ff3333" /></div>
-        <div class="setting-row"><label for="highlight-fill-opacity">투명도</label><input type="range" id="highlight-fill-opacity" min="0" max="1" step="0.05" value="0.4" /><span class="range-val">0.4</span></div>
-        <div class="setting-row"><label for="highlight-stroke-weight">굵기</label><input type="range" id="highlight-stroke-weight" min="1" max="8" step="0.5" value="4" /><span class="range-val">4</span></div>
-      </div>
-      <div class="settings-section">
-        <h4>경계 스무딩</h4>
-        <div class="setting-row"><label for="smooth-toggle">활성화</label><label class="toggle-switch"><input type="checkbox" id="smooth-toggle" /><span class="toggle-slider"></span></label></div>
-        <div class="setting-row"><label for="smooth-iterations">강도</label><input type="range" id="smooth-iterations" min="1" max="5" step="1" value="2" /><span class="range-val">2</span></div>
+      <div class="zone-io-row">
+        <button id="zone-export-btn" class="action-btn small">📥 내보내기</button>
+        <button id="zone-import-btn" class="action-btn small">📤 불러오기</button>
+        <input type="file" id="zone-import-file" accept=".json" style="display:none" />
       </div>
     </div>
-    <div id="trend-settings" style="display:none;">
-      <div class="settings-section">
-        <h4>헥사곤 그리드</h4>
-        <div class="setting-row"><label for="hex-radius">반경</label><input type="range" id="hex-radius" min="0.3" max="3" step="0.1" value="1" /><span class="range-val" id="hex-radius-label">1.0km</span></div>
-        <div class="setting-row"><label for="hex-fill">배경색</label><input type="color" id="hex-fill" value="#4fc3f7" /></div>
-        <div class="setting-row"><label for="hex-stroke">테두리색</label><input type="color" id="hex-stroke" value="#0288d1" /></div>
-        <div class="setting-row"><label for="hex-fill-opacity">투명도</label><input type="range" id="hex-fill-opacity" min="0" max="1" step="0.05" value="0.08" /><span class="range-val">0.08</span></div>
+
+    <!-- 설정 토글 -->
+    <div class="settings-toggle-row" id="settings-toggle-row">
+      <button id="settings-toggle">⚙ 설정 <span class="toggle-arrow">▾</span></button>
+    </div>
+
+    <!-- 설정 패널 (좌측 내장) -->
+    <div id="settings-section" style="display:none;">
+      <div id="local-settings">
+        <div class="settings-section">
+          <h4>비선택 구역</h4>
+          <div class="setting-row"><label>배경색</label><input type="color" id="default-fill" value="#cccccc" /></div>
+          <div class="setting-row"><label>테두리색</label><input type="color" id="default-stroke" value="#999999" /></div>
+          <div class="setting-row"><label>투명도</label><input type="range" id="default-fill-opacity" min="0" max="1" step="0.05" value="0.12" /><span class="range-val">0.12</span></div>
+          <div class="setting-row"><label>굵기</label><input type="range" id="default-stroke-weight" min="0.5" max="6" step="0.5" value="1" /><span class="range-val">1</span></div>
+        </div>
+        <div class="settings-section">
+          <h4>선택 구역</h4>
+          <div class="setting-row"><label>배경색</label><input type="color" id="highlight-fill" value="#ff3333" /></div>
+          <div class="setting-row"><label>테두리색</label><input type="color" id="highlight-stroke" value="#ff3333" /></div>
+          <div class="setting-row"><label>투명도</label><input type="range" id="highlight-fill-opacity" min="0" max="1" step="0.05" value="0.4" /><span class="range-val">0.4</span></div>
+          <div class="setting-row"><label>굵기</label><input type="range" id="highlight-stroke-weight" min="1" max="8" step="0.5" value="4" /><span class="range-val">4</span></div>
+        </div>
+        <div class="settings-section">
+          <h4>경계 스무딩</h4>
+          <div class="setting-row"><label>활성화</label><label class="toggle-switch"><input type="checkbox" id="smooth-toggle" /><span class="toggle-slider"></span></label></div>
+          <div class="setting-row"><label>강도</label><input type="range" id="smooth-intensity" min="0" max="1" step="0.1" value="0.5" /><span class="range-val">0.5</span></div>
+        </div>
       </div>
-      <div class="settings-section">
-        <h4>선택 헥사곤</h4>
-        <div class="setting-row"><label for="hex-sel-fill">배경색</label><input type="color" id="hex-sel-fill" value="#ff9800" /></div>
-        <div class="setting-row"><label for="hex-sel-opacity">투명도</label><input type="range" id="hex-sel-opacity" min="0" max="1" step="0.05" value="0.45" /><span class="range-val">0.45</span></div>
+      <div id="trend-settings" style="display:none;">
+        <div class="settings-section">
+          <h4>헥사곤 그리드</h4>
+          <div class="setting-row"><label>반경</label><input type="range" id="hex-radius" min="0.3" max="3" step="0.1" value="1" /><span class="range-val" id="hex-radius-label">1.0km</span></div>
+          <div class="setting-row"><label>배경색</label><input type="color" id="hex-fill" value="#4fc3f7" /></div>
+          <div class="setting-row"><label>테두리색</label><input type="color" id="hex-stroke" value="#0288d1" /></div>
+          <div class="setting-row"><label>투명도</label><input type="range" id="hex-fill-opacity" min="0" max="1" step="0.05" value="0.08" /><span class="range-val">0.08</span></div>
+        </div>
+        <div class="settings-section">
+          <h4>선택 헥사곤</h4>
+          <div class="setting-row"><label>배경색</label><input type="color" id="hex-sel-fill" value="#ff9800" /></div>
+          <div class="setting-row"><label>투명도</label><input type="range" id="hex-sel-opacity" min="0" max="1" step="0.05" value="0.45" /><span class="range-val">0.45</span></div>
+        </div>
       </div>
     </div>
   </div>
