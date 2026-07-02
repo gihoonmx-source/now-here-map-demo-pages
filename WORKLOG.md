@@ -23,6 +23,14 @@ git push
 - 이 repo는 **`main` 브랜치 루트에서 GitHub Pages 자동 배포**됨 → main에 push하면 1~2분 뒤 배포 반영.
 - 배포 URL: **https://gihoon-mx.github.io/now-here-map-demo-pages/**
 
+### 🔢 버전 규칙 (코드/스타일 바꿀 때마다 필수)
+제작(코드·스타일·기능 변경)마다 버전을 올리고 **3곳을 동기화**:
+1. `index.html` → `<span id="app-version">vX.Y.Z</span>`
+2. asset 캐시버스트 → `style.css?v=X.Y.Z`, `app.js?v=X.Y.Z`, `config.js?v=X.Y.Z`
+3. 커밋 메시지에 `vX.Y.Z`
+- 증가: 일반 변경 = 패치(+0.0.1), 큰 기능 = 마이너(+0.1.0). 문서(WORKLOG 등)만 바뀌면 버전 유지.
+- **현재 최신: v1.3.0**
+
 ---
 
 ## 🔐 계정 / 인증 (중요)
