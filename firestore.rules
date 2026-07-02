@@ -1,0 +1,38 @@
+// Firestore 보안 규칙 — now-here-demo 프로젝트
+// ------------------------------------------------------------------
+// 이 파일이 규칙의 "소스 오브 트루스". Firebase 콘솔에 붙여넣어 배포하고,
+// 콘솔에서 바꾼 경우 반드시 이 파일도 같은 내용으로 갱신 후 commit 하세요.
+//
+// 앱 접근 패턴(app.js 기준):
+//   - allowlist/{email}  : 유저가 본인 문서 읽기 / 관리자가 목록·추가·삭제
+//   - users/{uid}        : 관리자가 본인 문서 읽기·저장(설정/zones)
+// 컬렉션은 allowlist, users 2개뿐.
+//
+// 주의:
+//   1) 아래 bootstrapAdmin 이메일은 config.js 의 ADMIN_EMAIL 과 반드시 일치해야 함.
+//   2) 앱은 이메일을 소문자로 doc id/비교에 사용. Google 이메일은 사실상 소문자라 문제없으나,
+//      완벽히 하려면 email() 을 request.auth.token.email.lower() 로 바꿔도 됨(선택).
+// ------------------------------------------------------------------
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn()       { return request.auth != null; }
+    function email()          { return request.auth.token.email; }
+    function bootstrapAdmin() { return signedIn() && email() == 'gihoon.mx@gmail.com'; }
+    function allowRef()       { return /databases/$(database)/documents/allowlist/$(email()); }
+    function listed()         { return signedIn() && exists(allowRef()); }
+    function isAdmin()        { return bootstrapAdmin() || (listed() && get(allowRef()).data.role == 'admin'); }
+    function isAllowed()      { return bootstrapAdmin() || listed(); }
+
+    match /allowlist/{docId} {
+      allow read:  if signedIn() && (isAdmin() || docId == email());
+      allow write: if isAdmin();
+    }
+    match /users/{uid} {
+      allow read, write: if isAllowed() && (request.auth.uid == uid || isAdmin());
+      match /{document=**} {
+        allow read, write: if isAllowed() && (request.auth.uid == uid || isAdmin());
+      }
+    }
+  }
+}

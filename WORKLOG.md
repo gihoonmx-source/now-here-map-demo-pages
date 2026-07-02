@@ -50,6 +50,7 @@ git push
 | `app.js` | 앱 로직 (지도, 로그인, 관리자 뷰 등) |
 | `style.css` | 스타일 |
 | `config.js` | 설정값 (Maps/Firebase 키, ADMIN_EMAIL 등) |
+| `firestore.rules` | Firestore 보안 규칙 (소스 오브 트루스 — 콘솔과 동기화 유지) |
 | `dong_boundary.geojson` | 동 단위 행정구역 경계 데이터 |
 
 ---
@@ -67,9 +68,21 @@ git push
 3. hot-hot-map → Maps Platform 키 · HTTP 리퍼러
 4. Firebase Console → Authentication → Settings → **승인된 도메인**
 
+⚠️⚠️ **Firebase 브라우저 키(1번)의 HTTP 리퍼러에는 앱 도메인과 별개로 아래가 항상 있어야 함** (없으면 Google 로그인이 403 `API_KEY_HTTP_REFERRER_BLOCKED` → "The requested action is invalid."로 깨짐. 로그인 팝업이 이 도메인에서 돌기 때문):
+- `https://now-here-demo.firebaseapp.com/*`
+- `https://now-here-demo.web.app/*`
+
+### Firestore 규칙
+- 소스 오브 트루스: repo의 **`firestore.rules`**. 콘솔(Firebase → Firestore → 규칙)에 배포하며, 양쪽을 항상 같게 유지.
+- 규칙의 관리자 이메일(`gihoon.mx@gmail.com`)은 `config.js`의 `ADMIN_EMAIL`과 일치해야 함.
+
 ---
 
 ## 📝 변경 이력
+
+### 2026-07-03
+- **Google 로그인 복구**: Firebase 브라우저 키 리퍼러에 `now-here-demo.firebaseapp.com`(+`web.app`)이 빠져 403으로 로그인이 깨졌던 것 → 리퍼러 추가로 해결 (위 ⚠️⚠️ 참고).
+- **Firestore 규칙을 repo로 편입**: `firestore.rules` 추가. 기존 `allow read,write: if false`(전면 차단)에서 → 로그인/allowlist/유저데이터 접근을 실제 앱 패턴에 맞춰 허용하는 규칙으로 교체(콘솔 배포). allowlist(본인 문서 읽기/관리자 관리) + users/{uid}(관리자 본인 데이터) 구조.
 
 ### 2026-07-02
 - **GitHub username 변경: `gihoonmx-source` → `gihoon-mx`.**
